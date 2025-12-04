@@ -5,8 +5,8 @@ BASE_DIR = pathlib.Path(__file__).parent
 
 
 def read_input() -> Iterable[str]:
-    with open(BASE_DIR / "input.txt", "r") as f:
-        for line in f.readlines():
+    with open(BASE_DIR / "input.txt") as f:
+        for line in f:
             yield line.strip()
 
 
@@ -30,6 +30,23 @@ def find_largest_joltage(bank: str) -> int:
     return int(str(left_battery) + str(right_battery))
 
 
+def find_largest_joltage_with_n_batteries(bank: str, n: int) -> int:
+    largest_digit = 0
+    largest_digit_index = len(bank) - n
+    for i in range(len(bank) - n, -1, -1):
+        if int(bank[i]) > largest_digit:
+            largest_digit = int(bank[i])
+            largest_digit_index = i
+        elif int(bank[i]) == largest_digit:
+            largest_digit_index = i
+
+    if n > 1:
+        next_largest = find_largest_joltage_with_n_batteries(bank[largest_digit_index + 1:], n - 1)
+        return int(str(largest_digit) + str(next_largest))
+    else:
+        return largest_digit
+
+
 def part1() -> None:
     solution = sum(
         find_largest_joltage(bank)
@@ -40,7 +57,12 @@ def part1() -> None:
 
 
 def part2() -> None:
-    pass
+    solution = sum(
+        find_largest_joltage_with_n_batteries(bank, 12)
+        for bank in read_input()
+    )
+
+    print(solution)
 
 
 if __name__ == "__main__":
