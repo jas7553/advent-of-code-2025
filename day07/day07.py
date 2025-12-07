@@ -52,7 +52,56 @@ def part1() -> None:
 
 
 def part2() -> None:
-    pass
+    way_to_get_to: dict[tuple[int, int], int] = dict()
+    way_to_get_to[(0, 0)] = 5
+
+    diagram = Diagram(read_input())
+
+    solution = sum([
+        timeline_count(diagram, len(diagram.rows) - 1, c)
+        for c in range(0, len(diagram.rows[0]))
+    ])
+
+    print(solution)
+
+
+way_to_get_to: dict[tuple[int, int], int] = {}
+
+
+def timeline_count(diagram: Diagram, r: int, c: int) -> int:
+    if r == 0:
+        if c == diagram.rows[0].find('S'):
+            return 1
+        else:
+            return 0
+
+    if c < 0 or c >= len(diagram.rows[0]):
+        return 0
+
+    if r % 2 == 1:
+        return timeline_count(diagram, r - 1, c)
+
+    if (r, c) in way_to_get_to:
+        return way_to_get_to[(r, c)]
+
+    if diagram.rows[r][c] == '.':
+        total_ways_to_reach = 0
+
+        if c - 1 >= 0 and diagram.rows[r][c - 1] == '^':
+            from_left = timeline_count(diagram, r - 1, c - 1)
+            way_to_get_to[(r - 1, c - 1)] = from_left
+            total_ways_to_reach += from_left
+
+        if c + 1 < len(diagram.rows[0]) and diagram.rows[r][c + 1] == '^':
+            from_right = timeline_count(diagram, r - 1, c + 1)
+            way_to_get_to[(r - 1, c + 1)] = from_right
+            total_ways_to_reach += from_right
+
+        total_ways_to_reach += timeline_count(diagram, r - 1, c)
+        way_to_get_to[(r, c)] = total_ways_to_reach
+        return total_ways_to_reach
+
+    return 0
 
 
 if __name__ == "__main__":
