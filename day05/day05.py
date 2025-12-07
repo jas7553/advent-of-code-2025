@@ -50,7 +50,29 @@ def part1() -> None:
 
 
 def part2() -> None:
-    pass
+    fresh_ingredient_id_ranges, _ = read_input()
+
+    fresh_ingredient_id_ranges.sort(key=lambda id_range: id_range.start)
+
+    first_id_range = fresh_ingredient_id_ranges[0]
+    small, big = first_id_range.start, first_id_range.end
+
+    ranges = []
+    for id_range in fresh_ingredient_id_ranges[1:]:
+        if id_range.start > big:
+            ranges.append((small, big))
+            small, big = id_range.start, id_range.end
+        elif id_range.start >= small and id_range.end > big:
+            small, big = small, id_range.end
+
+    ranges.append((small, big))
+
+    solution = sum([
+        id_range[1] - id_range[0] + 1
+        for id_range in ranges
+    ])
+
+    print(solution)
 
 
 if __name__ == "__main__":
